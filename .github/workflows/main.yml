@@ -93,12 +93,14 @@ jobs:
     needs: [lint, dockerize]
     runs-on: ubuntu-latest
     steps:
-      - name: Send Notification
-        run: |
-          if [ "${{ job.status }}" == "success" ]; then
-            echo "Deployment Successful! Image pushed to Docker Hub."
-          else
-            echo "Error in Deployment!"
-            # Add more notification methods here (e.g., Slack, Email)
-            exit 1
-        continue-on-error: true  # Allow notification step to fail without affecting workflow
+    - name: Send Notification
+      run: |
+        if [ "${{ job.status }}" == "success" ]; then
+          echo "Deployment Successful! Image pushed to Docker Hub."
+        else
+          echo "Error in Deployment!"
+          # Add more notification methods here (e.g., Slack, Email)
+          exit 1
+        fi  # Close the 'if' block
+      shell: bash
+      continue-on-error: true  # Allow notification step to fail without affecting workflow
