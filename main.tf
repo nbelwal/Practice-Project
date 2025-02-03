@@ -53,7 +53,7 @@ resource "aws_instance" "ec2_instance" {
     sudo install minikube-linux-amd64 /usr/local/bin/minikube && rm minikube-linux-amd64
 
     # Start Minikube
-    sudo minikube start --driver=none  # Use the 'none' driver to run Minikube directly on the host
+    sudo minikube start
   EOF
 
   # Output the public IP of the EC2 instance
