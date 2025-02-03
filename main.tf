@@ -42,6 +42,7 @@ resource "aws_instance" "ec2_instance" {
     sudo groupadd docker 
     sudo usermod -aG docker $USER  
     sudo apt-get install docker.io -y
+    sudo usermod -aG docker $USER 
     
     # Install kubectl
     curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
