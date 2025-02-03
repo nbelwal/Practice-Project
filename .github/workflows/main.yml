@@ -165,7 +165,7 @@ jobs:
           echo "EC2 IP Address: ${{ env.ec2_ip }}"  # Debug IP again to ensure it's available
           scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no deployment.yaml ubuntu@${{ env.ec2_ip }}:/home/ubuntu/
     
-    - name: Configure kubectl, install tools, and apply deployment.yaml
+    - name: Configure kubectl, install tools
       run: |
           ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ubuntu@${{ env.ec2_ip }} << EOF
             # Update package index
@@ -195,7 +195,12 @@ jobs:
             chmod +x minikube
             sudo mv minikube /usr/local/bin/
           
-            # Start minikube
+           EOF
+
+    - name: apply deployment.yaml
+      run: |
+            ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ubuntu@${{ env.ec2_ip }} << EOF
+             # Start minikube
             bash -l -c "minikube start"
             sleep 5
             # Apply deployment.yaml
@@ -206,4 +211,5 @@ jobs:
 
             # Port-forward after a brief wait
             bash -l -c "kubectl port-forward --address 0.0.0.0 service/my-app-service 30326:80 &"
-          EOF
+          
+            EOF
