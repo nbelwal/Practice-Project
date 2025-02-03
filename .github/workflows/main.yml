@@ -187,5 +187,6 @@ jobs:
             # Start minikube and apply kubectl commands
             bash -l -c "minikube start"
             bash -l -c "kubectl apply -f /home/ubuntu/deployment.yaml"
+            bash -l -c "sleep 10"
             bash -l -c "kubectl port-forward --address 0.0.0.0 service/my-app-service 30326:80 &"
           EOF
