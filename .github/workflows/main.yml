@@ -160,7 +160,11 @@ jobs:
 
     - name: Copy deployment.yaml to EC2
       run: |
-        scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no deployment.yaml ubuntu@${{ steps.ec2_ip.outputs.ec2_ip }}:/home/ubuntu/
+        # Debug the private key and the IP address
+        ls -l ~/.ssh/
+        echo "EC2 IP Address: ${{ env.ec2_ip }}"
+        # Use SCP to copy the file to EC2 instance
+        scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no deployment.yaml ubuntu@${{ env.ec2_ip }}:/home/ubuntu/
 
     - name: Configure kubectl and apply deployment.yaml
       run: |
