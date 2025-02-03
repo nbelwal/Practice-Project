@@ -141,35 +141,37 @@ jobs:
         echo "ec2_ip=$instance_ip" >> $GITHUB_ENV  # Set EC2 IP as an environment variable
 
   deploy:
-    needs: terraform
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Set up SSH for EC2 access
-      run: |
-        mkdir -p ~/.ssh
-        # Debug the IP address
-        echo "EC2 IP Address: ${{ env.ec2_ip }}"
-        # Wait for EC2 instance to be ready
-        sleep 30  # Wait for the instance to be accessible
-        # Fetch the SSH key for the EC2 instance
-        ssh-keyscan -H ${{ env.ec2_ip }} >> ~/.ssh/known_hosts || echo "ssh-keyscan failed"
-
-    - name: Copy deployment.yaml to EC2
-      run: |
-        # Debug the private key and the IP address
-        ls -l ~/.ssh/
-        echo "EC2 IP Address: ${{ env.ec2_ip }}"
-        # Use SCP to copy the file to EC2 instance
-        scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no deployment.yaml ubuntu@${{ env.ec2_ip }}:/home/ubuntu/
-
-    - name: Configure kubectl and apply deployment.yaml
-      run: |
-        # SSH into EC2 instance to set up kubectl config and apply the deployment
-        ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ubuntu@${{ steps.ec2_ip.outputs.ec2_ip }} << EOF
-          kubectl apply -f /home/ubuntu/deployment.yaml
-          kubectl port-forward --address 0.0.0.0 service/my-app-service 30326:80 &
-        EOF
+      needs: terraform
+      runs-on: ubuntu-latest
+    
+      steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+    
+      - name: Set up SSH for EC2 access
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ls -l ~/.ssh/  # Debug the contents of ~/.ssh
+          # Debug the IP address
+          echo "EC2 IP Address: ${{ env.ec2_ip }}"
+          # Wait for EC2 instance to be ready
+          sleep 30  # Wait for the instance to be accessible
+          # Fetch the SSH key for the EC2 instance
+          ssh-keyscan -H ${{ env.ec2_ip }} >> ~/.ssh/known_hosts || echo "ssh-keyscan failed"
+    
+      - name: Check if SSH private key exists
+        run: ls -l ~/.ssh/  # Check the contents of ~/.ssh to ensure the private key exists
+    
+      - name: Copy deployment.yaml to EC2
+        run: |
+          echo "EC2 IP Address: ${{ env.ec2_ip }}"  # Debug IP again to ensure it's available
+          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no deployment.yaml ubuntu@${{ env.ec2_ip }}:/home/ubuntu/
+    
+      - name: Configure kubectl and apply deployment.yaml
+        run: |
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ubuntu@${{ env.ec2_ip }} << EOF
+            kubectl apply -f /home/ubuntu/deployment.yaml
+            kubectl port-forward --address 0.0.0.0 service/my-app-service 30326:80 &
+          EOF
