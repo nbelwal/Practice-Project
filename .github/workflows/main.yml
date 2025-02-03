@@ -160,12 +160,12 @@ jobs:
 
     - name: Copy deployment.yaml to EC2
       run: |
-        scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no deployment.yaml ec2-user@${{ steps.ec2_ip.outputs.ec2_ip }}:/home/ec2-user/
+        scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no deployment.yaml ubuntu@${{ steps.ec2_ip.outputs.ec2_ip }}:/home/ubuntu/
 
     - name: Configure kubectl and apply deployment.yaml
       run: |
         # SSH into EC2 instance to set up kubectl config and apply the deployment
-        ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ec2-user@${{ steps.ec2_ip.outputs.ec2_ip }} << EOF
-          kubectl apply -f /home/ec2-user/deployment.yaml
+        ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ubuntu@${{ steps.ec2_ip.outputs.ec2_ip }} << EOF
+          kubectl apply -f /home/ubuntu/deployment.yaml
           kubectl port-forward --address 0.0.0.0 service/my-app-service 30326:80 &
         EOF
