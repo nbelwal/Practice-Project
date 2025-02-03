@@ -40,7 +40,7 @@ resource "aws_instance" "ec2_instance" {
     sudo apt-get update
     sudo apt-get install ca-certificates curl
     sudo groupadd docker 
-    sudo usermod -aG docker $USER  
+    sudo usermod -aG docker ubuntu  
     sudo apt-get install docker.io -y
     sudo usermod -aG docker $USER 
     
