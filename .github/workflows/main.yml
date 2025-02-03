@@ -140,7 +140,7 @@ jobs:
         terraform_output=$(terraform output -raw ec2_instance_public_ip)
         echo "Raw Terraform Output: $terraform_output"
         instance_ip=$(echo "$terraform_output" | grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}' | tr -d '\r\n')
-        instance_ip=$(echo "instance_ip" | sed 's/\(.*\)\1/\1/')
+        instance_ip=$(echo "$instance_ip" | sed 's/\(.*\)\1/\1/')
         echo "Cleaned EC2 IP Address: $instance_ip"
         echo "ec2_ip=$instance_ip" >> $GITHUB_ENV
 
