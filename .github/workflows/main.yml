@@ -143,16 +143,8 @@ jobs:
         echo "Cleaned EC2 IP Address: $instance_ip"
         echo "ec2_ip=$instance_ip" >> $GITHUB_ENV
 
-  deploy:
-      needs: terraform
-      runs-on: ubuntu-latest
-    
-      steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-    
-      - name: Set up SSH for EC2 access
-        run: |
+    - name: Set up SSH for EC2 access
+      run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
@@ -164,16 +156,16 @@ jobs:
           # Fetch the SSH key for the EC2 instance
           ssh-keyscan -H ${{ env.ec2_ip }} >> ~/.ssh/known_hosts || echo "ssh-keyscan failed"
     
-      - name: Check if SSH private key exists
-        run: ls -l ~/.ssh/  # Check the contents of ~/.ssh to ensure the private key exists
+    - name: Check if SSH private key exists
+      run: ls -l ~/.ssh/  # Check the contents of ~/.ssh to ensure the private key exists
     
-      - name: Copy deployment.yaml to EC2
-        run: |
+    - name: Copy deployment.yaml to EC2
+      run: |
           echo "EC2 IP Address: ${{ env.ec2_ip }}"  # Debug IP again to ensure it's available
           scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no deployment.yaml ubuntu@${{ env.ec2_ip }}:/home/ubuntu/
     
-      - name: Configure kubectl and apply deployment.yaml
-        run: |
+    - name: Configure kubectl and apply deployment.yaml
+      run: |
           ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ubuntu@${{ env.ec2_ip }} << EOF
             kubectl apply -f /home/ubuntu/deployment.yaml
             kubectl port-forward --address 0.0.0.0 service/my-app-service 30326:80 &
