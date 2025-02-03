@@ -137,9 +137,18 @@ jobs:
     - name: Get EC2 Instance Public IP
       id: ec2_ip
       run: |
-        instance_ip=$(terraform output -raw ec2_instance_public_ip | awk '{print $NF}')
+        # Print the raw terraform output to understand the format
+        terraform_output=$(terraform output -raw ec2_instance_public_ip)
+        echo "Raw Terraform output: $terraform_output"  # Debug: print full terraform output
+        
+        # Extract just the IP address using sed or awk (adjust based on the raw output)
+        instance_ip=$(echo "$terraform_output" | sed -E 's/.*([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+).*/\1/')
+        
+        # Print the cleaned EC2 IP address
+        echo "Cleaned EC2 IP Address: $instance_ip"  # Debug: print the cleaned IP
+        
+        # Set the IP to the environment variable
         echo "ec2_ip=$instance_ip" >> $GITHUB_ENV
-        echo "EC2 IP is: $instance_ip"
 
   deploy:
       needs: terraform
