@@ -104,3 +104,66 @@ jobs:
         fi  # Close the 'if' block
       shell: bash
       continue-on-error: true  # Allow notification step to fail without affecting workflow
+
+  terraform:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.4.0  # You can change this to the version you need.
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1  # Specify your region
+
+    - name: Terraform Init
+      run: terraform init
+
+    - name: Terraform Plan
+      run: terraform plan
+
+    - name: Terraform Apply
+      run: terraform apply -auto-approve
+
+    # Save the EC2 instance public IP or DNS for the next step
+    - name: Get EC2 Instance Public IP
+      id: ec2_ip
+      run: |
+        instance_ip=$(terraform output -raw ec2_instance_public_ip) # Make sure the output is defined in your Terraform configuration
+        echo "::set-output name=ec2_ip::$instance_ip"
+
+  deploy:
+    needs: terraform
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up SSH for EC2 access
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ steps.ec2_ip.outputs.ec2_ip }} >> ~/.ssh/known_hosts
+
+    - name: Copy deployment.yaml to EC2
+      run: |
+        scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no deployment.yaml ec2-user@${{ steps.ec2_ip.outputs.ec2_ip }}:/home/ec2-user/
+
+    - name: Configure kubectl and apply deployment.yaml
+      run: |
+        # SSH into EC2 instance to set up kubectl config and apply the deployment
+        ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ec2-user@${{ steps.ec2_ip.outputs.ec2_ip }} << EOF
+          # Set up Minikube environment variables
+          export KUBEVIRT_VERSION=\$(kubectl version --short --client)
+          kubectl apply -f /home/ec2-user/deployment.yaml
+        EOF
