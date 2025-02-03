@@ -137,9 +137,9 @@ jobs:
     - name: Get EC2 Instance Public IP
       id: ec2_ip
       run: |
-        instance_ip=$(terraform output -raw ec2_instance_public_ip | tr -d '\r\n')
-        echo "ec2_ip=$instance_ip" >> $GITHUB_ENV  # Set EC2 IP as an environment variable
-        echo $GITHUB_ENV
+        instance_ip=$(terraform output -raw ec2_instance_public_ip)
+        echo "ec2_ip=$instance_ip" >> $GITHUB_ENV
+        echo "EC2 IP is: $instance_ip"
 
   deploy:
       needs: terraform
