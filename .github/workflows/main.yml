@@ -137,8 +137,8 @@ jobs:
     - name: Get EC2 Instance Public IP
       id: ec2_ip
       run: |
-        instance_ip=$(terraform output -raw ec2_instance_public_ip) # Make sure the output is defined in your Terraform configuration
-        echo "::set-output name=ec2_ip::$instance_ip"
+        instance_ip=$(terraform output -raw ec2_instance_public_ip)
+        echo "ec2_ip=$instance_ip" >> $GITHUB_ENV  # Set EC2 IP as an environment variable
 
   deploy:
     needs: terraform
@@ -153,7 +153,7 @@ jobs:
         mkdir -p ~/.ssh
         echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H ${{ steps.ec2_ip.outputs.ec2_ip }} >> ~/.ssh/known_hosts
+        ssh-keyscan -H ${{ env.ec2_ip }} >> ~/.ssh/known_hosts
 
     - name: Copy deployment.yaml to EC2
       run: |
