@@ -168,8 +168,7 @@ jobs:
     - name: Configure kubectl and apply deployment.yaml
       run: |
           ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ubuntu@${{ env.ec2_ip }} << EOF
-            sleep 5
-            minikube start
-            kubectl apply -f /home/ubuntu/deployment.yaml
-            kubectl port-forward --address 0.0.0.0 service/my-app-service 30326:80 &
+            bash -l -c "minikube start"
+            bash -l -c "kubectl apply -f /home/ubuntu/deployment.yaml"
+            bash -l -c "kubectl port-forward --address 0.0.0.0 service/my-app-service 30326:80 &"
           EOF
