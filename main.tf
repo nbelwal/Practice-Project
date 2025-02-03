@@ -33,16 +33,16 @@ resource "aws_instance" "ec2_instance" {
   user_data = <<-EOF
     #!/bin/bash
     # Update packages
-    sudo apt update -y
+   #  sudo apt update -y
     
     # Install Docker
     # Add Docker's official GPG key:
-    sudo apt-get update
-    sudo apt-get install ca-certificates curl
-    sudo groupadd docker 
-    sudo usermod -aG docker ubuntu  
-    sudo apt-get install docker.io -y
-    sudo usermod -aG docker $USER 
+    # sudo apt-get update
+    # sudo apt-get install ca-certificates curl
+    # sudo groupadd docker 
+    # sudo usermod -aG docker ubuntu  
+    # sudo apt-get install docker.io -y
+    # sudo usermod -aG docker $USER 
     
     # Install kubectl
    # curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
