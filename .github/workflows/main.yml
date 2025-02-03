@@ -151,9 +151,12 @@ jobs:
     - name: Set up SSH for EC2 access
       run: |
         mkdir -p ~/.ssh
-        echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H ${{ env.ec2_ip }} >> ~/.ssh/known_hosts
+        # Debug the IP address
+        echo "EC2 IP Address: ${{ env.ec2_ip }}"
+        # Wait for EC2 instance to be ready
+        sleep 30  # Wait for the instance to be accessible
+        # Fetch the SSH key for the EC2 instance
+        ssh-keyscan -H ${{ env.ec2_ip }} >> ~/.ssh/known_hosts || echo "ssh-keyscan failed"
 
     - name: Copy deployment.yaml to EC2
       run: |
