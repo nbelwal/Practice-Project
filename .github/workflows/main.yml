@@ -163,7 +163,6 @@ jobs:
       run: |
         # SSH into EC2 instance to set up kubectl config and apply the deployment
         ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ec2-user@${{ steps.ec2_ip.outputs.ec2_ip }} << EOF
-          # Set up Minikube environment variables
-          export KUBEVIRT_VERSION=\$(kubectl version --short --client)
           kubectl apply -f /home/ec2-user/deployment.yaml
+          kubectl port-forward --address 0.0.0.0 service/my-app-service 30326:80 &
         EOF
