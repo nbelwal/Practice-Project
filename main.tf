@@ -45,15 +45,15 @@ resource "aws_instance" "ec2_instance" {
     sudo usermod -aG docker $USER 
     
     # Install kubectl
-    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-    sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+   # curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+   # sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
     
     # Install Minikube
-    curl -LO https://github.com/kubernetes/minikube/releases/latest/download/minikube-linux-amd64
-    sudo install minikube-linux-amd64 /usr/local/bin/minikube && rm minikube-linux-amd64
+   # curl -LO https://github.com/kubernetes/minikube/releases/latest/download/minikube-linux-amd64
+   # sudo install minikube-linux-amd64 /usr/local/bin/minikube && rm minikube-linux-amd64
 
     # Start Minikube
-    sudo minikube start
+   # sudo minikube start
   EOF
 
   # Output the public IP of the EC2 instance
