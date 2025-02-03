@@ -165,28 +165,40 @@ jobs:
           echo "EC2 IP Address: ${{ env.ec2_ip }}"  # Debug IP again to ensure it's available
           scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no deployment.yaml ubuntu@${{ env.ec2_ip }}:/home/ubuntu/
     
-    - name: Configure kubectl and apply deployment.yaml
+    - name: Configure kubectl, install tools, and apply deployment.yaml
       run: |
           ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ubuntu@${{ env.ec2_ip }} << EOF
-            # Install kubectl if not already installed
-            if ! command -v kubectl &> /dev/null
-            then
-              curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.24.0/bin/linux/amd64/kubectl
-              chmod +x ./kubectl
-              sudo mv ./kubectl /usr/local/bin/kubectl
-            fi
-            
-            # Install minikube if not already installed
-            if ! command -v minikube &> /dev/null
-            then
-              curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-              chmod +x minikube
-              sudo mv minikube /usr/local/bin/
-            fi
+            # Update package index
+            sudo apt-get update
 
-            # Start minikube and apply kubectl commands
+            # Install required dependencies
+            sudo apt-get install ca-certificates curl -y
+
+            # Install Docker
+            sudo apt-get install docker.io -y
+
+            # Add user to docker group
+            sudo usermod -aG docker ubuntu
+
+            # Install kubectl 
+            curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.24.0/bin/linux/amd64/kubectl
+            chmod +x ./kubectl
+            sudo mv ./kubectl /usr/local/bin/kubectl
+
+            # Install minikube 
+            curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+            chmod +x minikube
+            sudo mv minikube /usr/local/bin/
+          
+            # Start minikube
             bash -l -c "minikube start"
+
+            # Apply deployment.yaml
             bash -l -c "kubectl apply -f /home/ubuntu/deployment.yaml"
-            bash -l -c "sleep 10"
+
+            # Wait for a few seconds to ensure the deployment is applied
+            sleep 30  # Adjust as necessary
+
+            # Port-forward after a brief wait
             bash -l -c "kubectl port-forward --address 0.0.0.0 service/my-app-service 30326:80 &"
           EOF
