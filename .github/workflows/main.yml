@@ -168,6 +168,7 @@ jobs:
     - name: Configure kubectl, install tools
       run: |
           ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ubuntu@${{ env.ec2_ip }} << EOF
+            if ! command -v docker &> /dev/null; then
             # Update package index
             sudo apt-get update
             sleep 2
@@ -181,26 +182,23 @@ jobs:
             
             # Add user to docker group
             sudo usermod -aG docker ubuntu
-
+            fi
+            
+            if ! command -v kubectl &> /dev/null; then
             # Install kubectl 
             curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.24.0/bin/linux/amd64/kubectl
             sleep 2
             chmod +x ./kubectl
             sudo mv ./kubectl /usr/local/bin/kubectl
-            
+            fi
             
             # Install minikube 
             curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
             sleep 2
             chmod +x minikube
             sudo mv minikube /usr/local/bin/
-          
-           EOF
 
-    - name: apply deployment.yaml
-      run: |
-            ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ubuntu@${{ env.ec2_ip }} << EOF
-             # Start minikube
+           # Start minikube
             bash -l -c "minikube start"
             sleep 5
             # Apply deployment.yaml
@@ -212,4 +210,4 @@ jobs:
             # Port-forward after a brief wait
             bash -l -c "kubectl port-forward --address 0.0.0.0 service/my-app-service 30326:80 &"
           
-            EOF
+           EOF
