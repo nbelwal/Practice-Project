@@ -165,7 +165,7 @@ jobs:
           echo "EC2 IP Address: ${{ env.ec2_ip }}"  # Debug IP again to ensure it's available
           scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no deployment.yaml ubuntu@${{ env.ec2_ip }}:/home/ubuntu/
     
-    - name: Configure kubectl, install tools
+    - name: Configure kubectl, install tools and apply deployment
       run: |
           ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ubuntu@${{ env.ec2_ip }} << EOF
             if ! command -v docker &> /dev/null; then
@@ -210,7 +210,6 @@ jobs:
             sleep 15  # Adjust as necessary
 
             # Port-forward after a brief wait
-            bash -l -c "kubectl port-forward --address 0.0.0.0 service/my-app-service 30326:80 &"
-            bash -l -c "echo \"\""
-          
+            bash -l -c "nohup kubectl port-forward --address 0.0.0.0 service/my-app-service 30326:80 > /dev/null 2>&1 &"
+            
            EOF
