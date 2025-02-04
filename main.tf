@@ -6,8 +6,17 @@ data "aws_security_group" "testsg" {
   name = "allow_all_sg"
 }
 
+# Check if an instance with a specific tag already exists
+data "aws_instances" "existing_instance" {
+  filter {
+    name   = "tag:Name"
+    values = ["Minikube-EC2"]
+  }
+}
+
 # Define the EC2 instance
 resource "aws_instance" "ec2_instance" {
+  count           = length(data.aws_instances.existing_instance.ids) == 0 ? 1 : 0
   ami             = "ami-00bb6a80f01f03502"  
   instance_type   = "t3.small"
   security_groups = [data.aws_security_group.testsg.name]
@@ -42,15 +51,8 @@ resource "aws_instance" "ec2_instance" {
     Name = "Minikube-EC2"
   }
 
-  # Prevent unnecessary recreation due to changes in user_data
-  lifecycle {
-    ignore_changes = [
-      user_data,  # Ignore changes to user_data so it doesn't trigger an instance replacement
-    ]
-  }
-}
 
 # Output the public IP of the EC2 instance
 output "ec2_instance_public_ip" {
-  value = aws_instance.ec2_instance.public_ip
+  value = length(data.aws_instances.existing_instance.ids) > 0 ? data.aws_instances.existing_instance.ids[0] : aws_instance.ec2_instance[0].public_ip
 }
