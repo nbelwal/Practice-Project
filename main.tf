@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 data "aws_security_group" "testsg" {
-  id = "sg-0a1ade90b668eee03"
+  name = "allow_all"
 }
 
 # Define the EC2 instance
