@@ -2,10 +2,26 @@ provider "aws" {
   region = "ap-south-1"
 }
 
-data "aws_security_group" "testsg" {
-  filter {
-    name   = "group-name"
-    values = ["allow_all"]
+resource "aws_security_group" "allow_all" {
+  name        = "allow_all_sg"
+  description = "Security group allowing all traffic"
+  
+  ingress {
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]  # Allows all IPv4 traffic
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]  # Allows all IPv4 traffic
+  }
+
+  tags = {
+    Name = "AllowAllSecurityGroup"
   }
 }
 
@@ -13,7 +29,7 @@ data "aws_security_group" "testsg" {
 resource "aws_instance" "ec2_instance" {
   ami             = "ami-00bb6a80f01f03502"  
   instance_type   = "t3.small"
-  vpc_security_group_ids = [data.aws_security_group.testsg.id]
+  security_groups = [aws_security_group.allow_all.name]
   key_name        = "keypair_aws"
 
   # Install Docker, kubectl, and Minikube using user_data
