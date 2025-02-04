@@ -50,7 +50,7 @@ resource "aws_instance" "ec2_instance" {
   tags = {
     Name = "Minikube-EC2"
   }
-
+}
 
 # Output the public IP of the EC2 instance
 output "ec2_instance_public_ip" {
