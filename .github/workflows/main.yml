@@ -209,5 +209,6 @@ jobs:
 
             # Port-forward after a brief wait
             bash -l -c "kubectl port-forward --address 0.0.0.0 service/my-app-service 30326:80 &"
+            bash -l -c "echo \"\""
           
            EOF
