@@ -54,5 +54,5 @@ resource "aws_instance" "ec2_instance" {
 
 # Output the public IP of the EC2 instance
 output "ec2_instance_public_ip" {
-  value = length(data.aws_instances.existing_instance.ids) > 0 ? data.aws_instances.existing_instance.ids[0].public_ip : aws_instance.ec2_instance[0].public_ip
+  value = length(data.aws_instances.existing_instance.ids) > 0 ? data.aws_instances.existing_instance[0].public_ip : aws_instance.ec2_instance[0].public_ip
 }
