@@ -6,7 +6,7 @@ provider "aws" {
 resource "aws_instance" "ec2_instance" {
   ami             = "ami-00bb6a80f01f03502"  
   instance_type   = "t3.small"
-  security_groups = ["sg-0a1ade90b668eee03"]
+  security_group_ids = ["sg-0a1ade90b668eee03"]
   key_name        = "keypair_aws"
 
   # Install Docker, kubectl, and Minikube using user_data
