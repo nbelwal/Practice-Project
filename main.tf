@@ -3,14 +3,14 @@ provider "aws" {
 }
 
 data "aws_security_group" "testsg" {
-  id = "sg-0219e6d0b995a9a26"
+  name = "allow_all_sg"
 }
 
 # Define the EC2 instance
 resource "aws_instance" "ec2_instance" {
   ami             = "ami-00bb6a80f01f03502"  
   instance_type   = "t3.small"
-  security_groups = [data.aws_security_group.testsg.id]
+  security_groups = [data.aws_security_group.testsg.name]
   key_name        = "keypair_aws"
 
   # Install Docker, kubectl, and Minikube using user_data
