@@ -1,9 +1,9 @@
 name: Lint, Dockerize and Deploy to Docker Hub
 
 on:
-  push:
-    branches:
-      - main      # Trigger on push to main branch
+  #push:
+    #branches:
+   #   - main      # Trigger on push to main branch
   workflow_dispatch: # Manual trigger
 
 env:
