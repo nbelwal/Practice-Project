@@ -1,9 +1,9 @@
 name: Lint, Dockerize and Deploy to Docker Hub
 
 on:
-  #push:
-    #branches:
-   #   - main      # Trigger on push to main branch
+  push:
+    branches:
+     - main      # Trigger on push to main branch
   workflow_dispatch: # Manual trigger
 
 env:
@@ -191,12 +191,14 @@ jobs:
             chmod +x ./kubectl
             sudo mv ./kubectl /usr/local/bin/kubectl
             fi
-            
+
+            if ! command -v minikube &> /dev/null; then
             # Install minikube 
             curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
             sleep 2
             chmod +x minikube
             sudo mv minikube /usr/local/bin/
+            fi
 
            # Start minikube
             bash -l -c "minikube start"
