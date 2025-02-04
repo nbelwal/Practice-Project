@@ -33,20 +33,20 @@ resource "aws_instance" "ec2_instance" {
   user_data = <<-EOF
     #!/bin/bash
     # Update packages
-   #  sudo apt update -y
+    sudo apt update -y
     
     # Install Docker
-    # Add Docker's official GPG key:
-    # sudo apt-get update
-    # sudo apt-get install ca-certificates curl
-    # sudo groupadd docker 
-    # sudo usermod -aG docker ubuntu  
-    # sudo apt-get install docker.io -y
-    # sudo usermod -aG docker $USER 
+   # Add Docker's official GPG key:
+   # sudo apt-get update
+    sudo apt-get install ca-certificates curl -y
+    sudo groupadd docker 
+    sudo usermod -aG docker ubuntu  
+    sudo apt-get install docker.io -y
+    sudo usermod -aG docker $USER 
     
     # Install kubectl
-   # curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-   # sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+     curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+     sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
     
     # Install Minikube
    # curl -LO https://github.com/kubernetes/minikube/releases/latest/download/minikube-linux-amd64
